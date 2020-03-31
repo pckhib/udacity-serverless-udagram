@@ -67,6 +67,8 @@ provider:
       Resource: arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.CONNECTIONS_TABLE}
 
 functions:
+  Auth:
+    handler: src/lambda/auth/auth0Authorizer.handler
   CreateGroup:
     handler: src/lambda/http/createGroup.handler
     events:
@@ -74,6 +76,7 @@ functions:
           method: post
           path: groups
           cors: true
+          authorizer: Auth
           request:
             schema:
               application/json: ${file(models/create-group-request.json)}
@@ -91,6 +94,7 @@ functions:
           method: post
           path: groups/{groupId}/images
           cors: true
+          authorizer: Auth
           request:
             schema:
               application/json: ${file(models/create-image-request.json)}
@@ -157,6 +161,16 @@ functions:
 
 resources:
   Resources:
+    GatewayResponseDefault4XX:
+      Type: AWS::ApiGateway::GatewayResponse
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+          gatewayresponse.header.Access-Control-Allow-Methods: "'GET,OPTIONS,POST'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: ApiGatewayRestApi
     GroupsDynamoDBTable:
       Type: AWS::DynamoDB::Table
       Properties:
