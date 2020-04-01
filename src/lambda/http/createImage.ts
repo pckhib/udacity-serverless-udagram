@@ -15,7 +15,7 @@ const bucketName = process.env.IMAGES_S3_BUCKET;
 const urlExpiration: number = parseInt(process.env.SIGNED_URL_EXPIRATION);
 
 export const handler = middy(async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
-  console.log('Processing event: ', event)
+  console.log('Processing event: ', event);
   const groupId = event.pathParameters.groupId;
   const validGroupId = await groupExists(groupId);
 

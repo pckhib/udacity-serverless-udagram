@@ -77,6 +77,8 @@ provider:
       Resource: !GetAtt KMSKey.Arn
 
 functions:
+  RS256Auth:
+    handler: src/lambda/auth/rsa256Auth0Authorizer.handler
   Auth:
     handler: src/lambda/auth/auth0Authorizer.handler
   CreateGroup:
@@ -86,7 +88,7 @@ functions:
           method: post
           path: groups
           cors: true
-          authorizer: Auth
+          authorizer: RS256Auth
           request:
             schema:
               application/json: ${file(models/create-group-request.json)}
@@ -104,7 +106,7 @@ functions:
           method: post
           path: groups/{groupId}/images
           cors: true
-          authorizer: Auth
+          authorizer: RS256Auth
           request:
             schema:
               application/json: ${file(models/create-image-request.json)}
